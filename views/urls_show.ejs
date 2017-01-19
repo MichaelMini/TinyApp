@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<title>TinyApp</title>
-	<link rel="stylesheet" type="text/css" href="../style.css">
-</head>
-<body>
-    <!-- Add your EJS code here -->
-    <form method="POST" action="/urls/<%= shortURL %>">
-  		<p>ShortURL: <%= shortURL %>
-  		<input type="url" name="longURL" placeholder="http://" value="<%= longURL %>">
-  		<button type="">Update</button></p>
-    </form>
-</body>
+	<head>
+		<title>TinyApp</title>
+		<link rel="stylesheet" type="text/css" href="../style.css">
+	</head>
+	<body>
+	    <!-- Add your EJS code here -->
+	    <form method="POST" action="/urls/<%= shortURL %>">
+	  		<p>ShortURL: <%= shortURL %>
+	  		<input type="url" name="longURL" placeholder="http://" value="<%= longURL %>">
+	  		<button type="">Update</button></p>
+	    </form>
+	</body>
 </html>

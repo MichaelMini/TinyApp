@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<title>TinyApp</title>
-	<link rel="stylesheet" type="text/css" href="../style.css">
-</head>
-<body>
-  <!-- Add your EJS code here -->
-  <section>
-	  <% for ( var key in urls ) { %>
-		  <form method="POST" action="/urls/<%= key %>/delete">
-				<p><%= key %> -> <%= urls[key] %></p>
-				<p>
-					<a href="/urls/<%= key %>">Edit</a>
-					<button type="">Delete</button>
-				</p>
-		  </form>
-	  <% } %>
-  </section>
-</body>
+	<head>
+		<title>TinyApp</title>
+		<link rel="stylesheet" type="text/css" href="../style.css">
+	</head>
+	<body>
+	  <!-- Add your EJS code here -->
+	  <section>
+		  <% for ( var key in urls ) { %>
+			  <form method="POST" action="/urls/<%= key %>/delete">
+					<p><%= key %> -> <%= urls[key] %></p>
+					<p>
+						<a href="/urls/<%= key %>">Edit</a>
+						<button type="">Delete</button>
+					</p>
+			  </form>
+		  <% } %>
+	  </section>
+	</body>
 </html>
