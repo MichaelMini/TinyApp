@@ -1,10 +1,10 @@
 var express = require("express");
-var cookieParser = require('cookie-parser');
-
 var app = express();
+var PORT = process.env.PORT || 8080; // default port 8080
+
+var cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
-var PORT = process.env.PORT || 8080; // default port 8080
 
 app.set("view engine", "ejs");
 
