@@ -1,12 +1,16 @@
 var express = require("express");
 var app = express();
+app.set("view engine", "ejs");
 var PORT = process.env.PORT || 8080; // default port 8080
 
 var cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
-
-app.set("view engine", "ejs");
+app.use(function(req, res, next){
+  res.locals.username = req.cookies.username;
+  res.locals.user_id = req.cookies.user_id;
+  next();
+});
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -15,6 +19,8 @@ var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+let users = {};
 
 function generateRandomString( ranLength ) {
     var s = "";
@@ -43,8 +49,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = { username: req.cookies["username"] };
-  res.render("urls_new", templateVars);
+  res.render("urls_new");
 });
 
 app.post("/urls", (req, res) => {
@@ -58,8 +63,6 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-
-	const username = req.cookies.username;
   let templateVars = { urls: urlDatabase, foo: 123123 };
   res.render("urls_index", templateVars);
 });
@@ -88,16 +91,33 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   res.redirect('/urls');
 });
 
-// Username
-app.post("/login", (req, res) => {
+// Set Cookie Username
+app.post('/login', (req, res) => {
 	res.cookie("username", req.body.username);
 	res.redirect('/urls');
 });
 
-// Logout
-app.post("/logout", (req, res) => {
+// Clear Cookie Logout
+app.post('/logout', (req, res) => {
 	res.clearCookie("username", req.body.username);
 	res.redirect('/urls');
+});
+
+// Registration Page
+app.get('/register', (req, res) => {
+	res.render('users_register');
+});
+
+// Registration Handler
+app.post('/register', (req, res) => {
+	const checkEmail = Object.values(users).some((u) => u.email === req.body.email);
+	if (checkEmail || !req.body.email || !req.body.password) {
+		res.send('OMG :(', 404);
+	}
+	const id = generateRandomString( 6 );
+	res.cookie("user_id", id);
+	users[id] = {'id': id, 'email': req.body.email, 'password': req.body.password};
+	res.redirect('/');
 });
 
 app.listen(PORT, () => {
