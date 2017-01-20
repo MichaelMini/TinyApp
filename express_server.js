@@ -7,8 +7,7 @@ var cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
 app.use(function(req, res, next){
-  res.locals.username = req.cookies.username;
-  res.locals.user_id = req.cookies.user_id;
+  res.locals.user = users[req.cookies.user_id];
   next();
 });
 
