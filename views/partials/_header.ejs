@@ -1,14 +1,12 @@
-<% if (!username) { %>
-	<form action="/login" method="POST" style="margin:150px;">
-	  <!-- <label for="username">Enter your username:</label> -->
-	  <input id="username" type="text" name="username" placeholder="Your User Name" style="width: 300px">
-	  <button type="submit">Submit</button>
-	  <!-- <input type="submit" value="Submit"> -->
+<% if (user) { %>
+	<form action="/logout" method="POST" style="margin:150px;">
+	  <%= user.email %>
+	  <button type="submit">Logout</button>
 	</form>
 <%} else {%>
-	<form action="/logout" method="POST" style="margin:150px;">
-	  <!-- <label for="username">Enter your username:</label> -->
-	  <button type="submit">Logout</button>
-	  <!-- <input type="submit" value="Submit"> -->
+	<a href="/register">Sign Up</a>
+	<form action="/login" method="POST" style="margin:150px;">
+	  <input id="username" type="text" name="username" placeholder="Your User Name" style="width: 300px">
+	  <button type="submit">Submit</button>
 	</form>
 <%}%>
