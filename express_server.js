@@ -40,7 +40,7 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.end("Hello!");
+  res.end("Hello! " + req.cookies.user_id);
 });
 
 app.get("/hello", (req, res) => {
@@ -90,15 +90,9 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   res.redirect('/urls');
 });
 
-// Set Cookie Username
-app.post('/login', (req, res) => {
-	res.cookie("username", req.body.username);
-	res.redirect('/urls');
-});
-
 // Clear Cookie Logout
 app.post('/logout', (req, res) => {
-	res.clearCookie("username", req.body.username);
+	res.clearCookie("user_id", req.body.username);
 	res.redirect('/urls');
 });
 
@@ -115,10 +109,44 @@ app.post('/register', (req, res) => {
 	}
 	const id = generateRandomString( 6 );
 	res.cookie("user_id", id);
-	users[id] = {'id': id, 'email': req.body.email, 'password': req.body.password};
+	users[id] = {
+		'id': id,
+		'email': req.body.email,
+		'password': req.body.password
+	};
+	const userArr = Object.values(users).find( (u) => u.email === req.body.email );
+
+	console.log('users:', users);
+	console.log('userArr:', userArr);
 	res.redirect('/');
+});
+
+// Login Page
+app.get('/login', (req, res) => {
+	res.render('users_login');
+});
+
+// Set Cookie Username & Login Handler
+app.post('/login', (req, res) => {
+	const matchUser = Object.values(users).find( (u) => u.email === req.body.email );
+	if (!matchUser || matchUser.password !== req.body.password) {
+		res.send('OMG :(', 403);
+	} else {
+		res.cookie("user_id", matchUser.id);
+		res.redirect('/');
+	}
 });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+
+
+
+
+
+
+
+
+
