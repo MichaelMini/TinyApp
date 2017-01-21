@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 
 app.set("view engine", "ejs");
-const PORT = process.env.PORT || 8080; // default port 8080
+const PORT = process.env.PORT || 3000; // default port 8080
 
 const bcrypt = require('bcrypt');
 let hashed_password = '';
@@ -47,10 +47,10 @@ let users = {
 	}
 };
 app.use('/urls*?', (req,res, next) => {
-	if (req.user) {
+	if (req.session.user_id) {
 		next();
 	} else {
-		res.status(404).send('You must <a href="/login">sign in</a>');
+		res.status(401).send('You must <a href="/login">Sign In</a> or <a href="/register">Register Here</a>');
 	}
 });
 
@@ -111,6 +111,10 @@ app.post("/urls", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
 	const shortURL = req.params.shortURL;
+	console.log(!urlDatabase[shortURL]);
+  if (!urlDatabase[shortURL]) {
+		res.status(404).send('Your shortURL does not exist.');
+  }
   let templateVars = { username: req.session["username"], shortURL: shortURL, longURL: urlDatabase[shortURL].longUrl };
   res.render("urls_show", templateVars);
 });
