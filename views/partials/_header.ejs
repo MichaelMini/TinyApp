@@ -1,6 +1,6 @@
 <% if (user) { %>
 	<form action="/logout" method="POST">
-	  <%= user.email %>
+	  <p>User account email : <br><%= user.email %></p>
 	  <button type="submit">Logout</button>
 	</form>
 <%} else {%>
