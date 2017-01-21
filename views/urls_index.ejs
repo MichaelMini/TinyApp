@@ -6,10 +6,12 @@
 	</head>
 	<body>
 	  <!-- Add your EJS code here -->
+    <% include partials/_header %>
+    <a href="/urls/new">Create your shortUrl!</a>
 	  <section>
 		  <% for ( var key in urls ) { %>
 			  <form method="POST" action="/urls/<%= key %>/delete">
-					<p><%= key %> -> <%= urls[key] %></p>
+					<p><%= key %> -> <%= urls[key].longUrl %></p>
 					<p>
 						<a href="/urls/<%= key %>">Edit</a>
 						<button type="">Delete</button>
