@@ -1,12 +1,9 @@
 <% if (user) { %>
-	<form action="/logout" method="POST" style="margin:150px;">
+	<form action="/logout" method="POST">
 	  <%= user.email %>
 	  <button type="submit">Logout</button>
 	</form>
 <%} else {%>
 	<a href="/register">Sign Up</a>
-	<form action="/login" method="POST" style="margin:150px;">
-	  <input id="username" type="text" name="username" placeholder="Your User Name" style="width: 300px">
-	  <button type="submit">Submit</button>
-	</form>
+	<a href="/login">Login</a>
 <%}%>
