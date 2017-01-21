@@ -1,19 +1,27 @@
+const cookieSession = require('cookie-session');
 const express = require("express");
 const app = express();
+
 app.set("view engine", "ejs");
 const PORT = process.env.PORT || 8080; // default port 8080
 
 const bcrypt = require('bcrypt');
-// const password = "purple-monkey-dinosaur"; // you will probably this from req.params
 let hashed_password = '';
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
+app.use(cookieSession({
+  name: 'session',
+  keys: ['123'],
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
+
 app.use(function(req, res, next){
 	// Makes user useable in ejs files
-  res.locals.user = users[req.cookies.user_id];
+  res.locals.user = users[req.session.user_id];
   // Make req.user avable in routes
-  req.user = users[req.cookies.user_id];
+  req.user = users[req.session.user_id];
   next();
 });
 
@@ -70,7 +78,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-	if (req.cookies.user_id) {
+	if (req.session.user_id) {
 	  res.render("urls_new");
   } else {
   	res.redirect('/urls');
@@ -91,10 +99,10 @@ app.get("/urls", (req, res) => {
 
 // Block non-user to create link
 app.post("/urls", (req, res) => {
-	if (req.cookies.user_id) {
+	if (req.session.user_id) {
 		const longURL = req.body.longURL;
 		const shortURL = generateRandomString(6);
-		urlDatabase[shortURL] = { 'longUrl': longURL, 'createdBy': req.cookies.user_id };
+		urlDatabase[shortURL] = { 'longUrl': longURL, 'createdBy': req.session.user_id };
 		res.redirect('/urls');
 	} else {
 		res.redirect('login')
@@ -103,7 +111,7 @@ app.post("/urls", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
 	const shortURL = req.params.shortURL;
-  let templateVars = { username: req.cookies["username"], shortURL: shortURL, longURL: urlDatabase[shortURL].longUrl };
+  let templateVars = { username: req.session["username"], shortURL: shortURL, longURL: urlDatabase[shortURL].longUrl };
   res.render("urls_show", templateVars);
 });
 
@@ -122,7 +130,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 // Clear Cookie Logout
 app.post('/logout', (req, res) => {
-	res.clearCookie("user_id", req.body.username);
+	req.session.user_id = '';
 	res.redirect('/urls');
 });
 
@@ -140,7 +148,7 @@ app.post('/register', (req, res) => {
 		res.send('OMG :(... Please <a href="/register">Register </a> a different email and a proper password\n Or you can <a href="/login">Sign-in<a> to your existing account.', 404);
 	}
 	const id = generateRandomString( 6 );
-	res.cookie("user_id", id);
+	req.session.user_id = id;
 	users[id] = {
 		'id': id,
 		'email': req.body.email,
@@ -161,7 +169,7 @@ app.post('/login', (req, res) => {
 	if (!matchUser || !bcrypt.compareSync(req.body.password, matchUser.password)) {
 		res.send('Please <a href="/login">Sign-in</a> with your correct email and password.\n Or you can <a href="/register">Register here</a> for a new account.', 403);
 	} else {
-		res.cookie("user_id", matchUser.id);
+		req.session.user_id = matchUser.id;
 		res.redirect('/');
 	}
 });
