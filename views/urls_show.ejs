@@ -7,7 +7,8 @@
 	<body>
 	    <!-- Add your EJS code here -->
 	    <form method="POST" action="/urls/<%= shortURL %>">
-	  		<p>ShortURL: <%= shortURL %>
+	  		<p>ShortURL: <%= shortURL %></p>
+	  		<p>Current LongURL: <%= longURL %></p>
 	  		<input type="url" name="longURL" placeholder="http://" value="<%= longURL %>">
 	  		<button type="">Update</button></p>
 	    </form>
