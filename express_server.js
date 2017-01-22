@@ -47,7 +47,7 @@ let users = {
 	}
 };
 app.use('/urls*?', (req,res, next) => {
-	if (req.session.user_id) {
+	if (req.user) {
 		next();
 	} else {
 		res.status(401).send('You must <a href="/login">Sign In</a> or <a href="/register">Register Here</a>');
@@ -78,15 +78,16 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-	if (req.session.user_id) {
-	  res.render("urls_new");
+	if (req.user) {
+		// let templateVars = { urls: userUrls, foo: 123123 }; It doesn't make sense to have this in header.
+	  res.render("urls_new", templateVars);
   } else {
   	res.redirect('/urls');
   }
 });
 
-app.get("/urls", (req, res) => {
 	const userUrls = {};
+app.get("/urls", (req, res) => {
 	for ( let shortURL in urlDatabase ) {
 		if (urlDatabase[shortURL].createdBy === req.session.user_id) {
 			userUrls[shortURL] = urlDatabase[shortURL];
@@ -99,7 +100,7 @@ app.get("/urls", (req, res) => {
 
 // Block non-user to create link
 app.post("/urls", (req, res) => {
-	if (req.session.user_id) {
+	if (req.user) {
 		const longURL = req.body.longURL;
 		const shortURL = generateRandomString(6);
 		urlDatabase[shortURL] = { 'longUrl': longURL, 'createdBy': req.session.user_id };
@@ -125,6 +126,9 @@ app.post("/urls/:shortURL", (req, res) => {
 	const shortURL = req.params.shortURL;
 	const longURL = req.body.longURL;
 	urlDatabase[shortURL].longUrl = longURL;
+	if (!urlDatabase[shortURL]) {
+		res.status(404).send('Your shortURL does not exist.');
+	}
 	if (urlDatabase[shortURL].createdBy !== req.session.user_id) {
 		res.status(403).send('Congratulation! <br><br>Your failure attempt to edit someone\'s url is The Best Joke of the Day so far! <br><br>Please try again to see how long it will take you to break my Superior Code??? <br><br><br>Or perhaps... <br><br>NEVER!!!!!!!!!!!!!!!!!  <br><br><br>LMFAOTICBA... (go check UrbanDictionary!)');
 	}
@@ -134,18 +138,18 @@ app.post("/urls/:shortURL", (req, res) => {
 // Delete
 app.post('/urls/:shortURL/delete', (req, res) => {
 	delete urlDatabase[req.params.shortURL];
-  res.redirect('/urls');
+  res.redirect('/');
 });
 
 // Clear Cookie Logout
 app.post('/logout', (req, res) => {
 	req.session.user_id = '';
-	res.redirect('/urls');
+	res.redirect('/');
 });
 
 // Registration Page
 app.get('/register', (req, res) => {
-	if (req.session.user_id) {
+	if (req.user) {
 		res.redirect('/');
 	}
 	res.render('users_register');
@@ -175,11 +179,10 @@ app.post('/register', (req, res) => {
 
 // Login Page
 app.get('/login', (req, res) => {
-	if (req.session.user_id) {
+	if (req.user) {
 		res.redirect('/');
-	} else {
-		res.render('users_login');
 	}
+	res.render('users_login');
 });
 
 // Set Cookie Username & Login Handler
