@@ -2,6 +2,16 @@
 	<form action="/logout" method="POST">
 	  <p>User account email : <br><%= user.email %></p>
 	  <button type="submit">Logout</button>
+    <% for ( var key in urls ) { %>
+    	<!-- Do we need this loop in the header? it doesn't make sense -->
+  	  <!-- <form method="POST" action="/urls/<%= key %>/delete">
+  			<p><%= key %> -> <%= urls[key].longUrl %></p>
+  			<p>
+  				<a href="/urls/<%= key %>">Edit</a>
+  				<button type="">Delete</button>
+  			</p>
+  	  </form> -->
+    <% } %>
 	</form>
 <%} else {%>
 	<a href="/register">Sign Up</a>
