@@ -88,7 +88,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls", (req, res) => {
 	const userUrls = {};
 	for ( let shortURL in urlDatabase ) {
-		if (urlDatabase[shortURL].createdBy === req.user.id) {
+		if (urlDatabase[shortURL].createdBy === req.session.user_id) {
 			userUrls[shortURL] = urlDatabase[shortURL];
 		}
 	}
@@ -111,9 +111,11 @@ app.post("/urls", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
 	const shortURL = req.params.shortURL;
-	console.log(!urlDatabase[shortURL]);
   if (!urlDatabase[shortURL]) {
 		res.status(404).send('Your shortURL does not exist.');
+  }
+  if (urlDatabase[shortURL].createdBy !== req.session.user_id) {
+  	res.status(403).send('Congratulation! <br><br>Your failure attempt to edit someone\'s url is The Best Joke of the Day so far! <br><br>Please try again to see how long it will take you to break my Superior Code??? <br><br><br>Or perhaps... <br><br>NEVER!!!!!!!!!!!!!!!!!  <br><br><br>LMFAOTICBA... (go check UrbanDictionary!)');
   }
   let templateVars = { username: req.session["username"], shortURL: shortURL, longURL: urlDatabase[shortURL].longUrl };
   res.render("urls_show", templateVars);
@@ -123,7 +125,10 @@ app.post("/urls/:shortURL", (req, res) => {
 	const shortURL = req.params.shortURL;
 	const longURL = req.body.longURL;
 	urlDatabase[shortURL].longUrl = longURL;
-	res.redirect('/urls');
+	if (urlDatabase[shortURL].createdBy !== req.session.user_id) {
+		res.status(403).send('Congratulation! <br><br>Your failure attempt to edit someone\'s url is The Best Joke of the Day so far! <br><br>Please try again to see how long it will take you to break my Superior Code??? <br><br><br>Or perhaps... <br><br>NEVER!!!!!!!!!!!!!!!!!  <br><br><br>LMFAOTICBA... (go check UrbanDictionary!)');
+	}
+	res.redirect(`/urls/${shortURL}`);
 });
 
 // Delete
@@ -140,6 +145,9 @@ app.post('/logout', (req, res) => {
 
 // Registration Page
 app.get('/register', (req, res) => {
+	if (req.session.user_id) {
+		res.redirect('/');
+	}
 	res.render('users_register');
 });
 
@@ -148,8 +156,11 @@ app.post('/register', (req, res) => {
 	// you will probably this from req.params // Need to know req.params
 	hashed_password = bcrypt.hashSync(req.body.password, 10);
 	const checkEmail = Object.values(users).some((u) => u.email === req.body.email);
-	if (checkEmail || !req.body.email || !req.body.password) {
-		res.send('OMG :(... Please <a href="/register">Register </a> a different email and a proper password\n Or you can <a href="/login">Sign-in<a> to your existing account.', 404);
+	if (checkEmail) {
+		res.send('Oh no... I think someone just stole your email and registered an account already. <br>Or you may have forgotten that you had already registered with this email. <br><br>Or maybe you are trying to steal someone\'s email... <br><br>Whatever... just <a href="/register">Register </a> with a different email and we are all good. <br><br>You are welcome to <a href="/login">Sign-in<a> to your existing account. Only if you have one already...', 400);
+	}
+	if (!req.body.email || !req.body.password) {
+		res.send('OMG :(... Please Type something... perhaps an real email with at least one digit password. <br><br>Click <a href="/register">Register </a> and try again. <br><br>Or you can <a href="/login">Sign-in<a> to your existing account.', 400);
 	}
 	const id = generateRandomString( 6 );
 	req.session.user_id = id;
@@ -164,14 +175,18 @@ app.post('/register', (req, res) => {
 
 // Login Page
 app.get('/login', (req, res) => {
-	res.render('users_login');
+	if (req.session.user_id) {
+		res.redirect('/');
+	} else {
+		res.render('users_login');
+	}
 });
 
 // Set Cookie Username & Login Handler
 app.post('/login', (req, res) => {
 	const matchUser = Object.values(users).find( (u) => u.email === req.body.email );// I need to know this
 	if (!matchUser || !bcrypt.compareSync(req.body.password, matchUser.password)) {
-		res.send('Please <a href="/login">Sign-in</a> with your correct email and password.\n Or you can <a href="/register">Register here</a> for a new account.', 403);
+		res.send('Please <a href="/login">Sign-in</a> with your correct email and password.\n Or you can <a href="/register">Register here</a> for a new account.', 401);
 	} else {
 		req.session.user_id = matchUser.id;
 		res.redirect('/');
