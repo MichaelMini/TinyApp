@@ -7,8 +7,10 @@
 	<body>
 	  <!-- Add your EJS code here -->
     <% include partials/_header %>
-    <a href="/urls/new">Create your shortUrl!</a>
 	  <section>
+	  	<form>
+		    <a href="/urls/new">Create your shortUrl!</a>
+	  	</form>
 		  <% for ( var key in urls ) { %>
 			  <form method="POST" action="/urls/<%= key %>/delete">
 					<p><%= key %> -> <%= urls[key].longUrl %></p>

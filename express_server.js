@@ -46,11 +46,11 @@ let users = {
 		password: "asdf"
 	}
 };
-app.use('/urls*?', (req,res, next) => {
+app.use('/urls*?', (req, res, next) => {
 	if (req.user) {
 		next();
 	} else {
-		res.status(401).send('You must <a href="/login">Sign In</a> or <a href="/register">Register Here</a>');
+		res.status(401).send('You must <a href="/login">Sign In</a> before you can enter this page. <br><br>Or you can <a href="/register">Register Here</a>');
 	}
 });
 
@@ -63,12 +63,6 @@ function generateRandomString( ranLength ) {
   return s;
 }
 
-app.get("/u/:shortURL", (req, res) => {
-	let shortURL = req.params.shortURL;
-  let longURL = urlDatabase[shortURL].longUrl;
-  res.redirect(longURL);
-});
-
 app.get("/", (req, res) => {
 	if (req.user) {
 		res.redirect('/urls');
@@ -77,17 +71,8 @@ app.get("/", (req, res) => {
 	}
 });
 
-app.get("/urls/new", (req, res) => {
-	if (req.user) {
-		// let templateVars = { urls: userUrls, foo: 123123 }; It doesn't make sense to have this in header.
-	  res.render("urls_new", templateVars);
-  } else {
-  	res.redirect('/urls');
-  }
-});
-
-	const userUrls = {};
 app.get("/urls", (req, res) => {
+	const userUrls = {};
 	for ( let shortURL in urlDatabase ) {
 		if (urlDatabase[shortURL].createdBy === req.session.user_id) {
 			userUrls[shortURL] = urlDatabase[shortURL];
@@ -97,6 +82,34 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+app.get("/urls/new", (req, res) => {
+	if (req.user) {
+	  res.render("urls_new");
+  } else {
+  	res.redirect('/urls');
+  }
+});
+
+app.get("/urls/:shortURL", (req, res) => {
+	const shortURL = req.params.shortURL;
+  if (!urlDatabase[shortURL]) {
+		res.status(404).send('This shortURL does not exist.');
+  }
+  if (urlDatabase[shortURL].createdBy !== req.session.user_id) {
+  	res.status(403).send('Congratulation! <br><br>Your failure attempt to edit someone\'s url is The Best Joke of the Day so far! <br><br>Please try again to see how long it will take you to break my Superior Code??? <br><br><br>Or perhaps... <br><br>NEVER!!!!!!!!!!!!!!!!!  <br><br><br>LMFAOTICBA... (go check UrbanDictionary!)');
+  }
+  let templateVars = { username: req.session["username"], shortURL: shortURL, longURL: urlDatabase[shortURL].longUrl };
+  res.render("urls_show", templateVars);
+});
+
+app.get("/u/:shortURL", (req, res) => {
+	const shortURL = req.params.shortURL;
+	if (!urlDatabase[shortURL]) {
+		res.status(404).send('This shortURL does not exist. Please check your short link and type carefully.');
+	}
+  const longURL = urlDatabase[shortURL].longUrl;
+  res.redirect(longURL);
+});
 
 // Block non-user to create link
 app.post("/urls", (req, res) => {
@@ -104,22 +117,10 @@ app.post("/urls", (req, res) => {
 		const longURL = req.body.longURL;
 		const shortURL = generateRandomString(6);
 		urlDatabase[shortURL] = { 'longUrl': longURL, 'createdBy': req.session.user_id };
-		res.redirect('/urls');
+		res.redirect(`/urls/${shortURL}`);
 	} else {
 		res.redirect('login')
 	}
-});
-
-app.get("/urls/:shortURL", (req, res) => {
-	const shortURL = req.params.shortURL;
-  if (!urlDatabase[shortURL]) {
-		res.status(404).send('Your shortURL does not exist.');
-  }
-  if (urlDatabase[shortURL].createdBy !== req.session.user_id) {
-  	res.status(403).send('Congratulation! <br><br>Your failure attempt to edit someone\'s url is The Best Joke of the Day so far! <br><br>Please try again to see how long it will take you to break my Superior Code??? <br><br><br>Or perhaps... <br><br>NEVER!!!!!!!!!!!!!!!!!  <br><br><br>LMFAOTICBA... (go check UrbanDictionary!)');
-  }
-  let templateVars = { username: req.session["username"], shortURL: shortURL, longURL: urlDatabase[shortURL].longUrl };
-  res.render("urls_show", templateVars);
 });
 
 app.post("/urls/:shortURL", (req, res) => {

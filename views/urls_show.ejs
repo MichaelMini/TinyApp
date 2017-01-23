@@ -6,6 +6,7 @@
 	</head>
 	<body>
 	    <!-- Add your EJS code here -->
+	    <% include partials/_header %>
 	    <form method="POST" action="/urls/<%= shortURL %>">
 	  		<p>ShortURL: <%= shortURL %></p>
 	  		<p>Current LongURL: <%= longURL %></p>
