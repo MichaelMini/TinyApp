@@ -1,13 +1,14 @@
-<% if (user) { %>
-	<form action="/logout" method="POST">
-		<div style="display: flex; flex-direction: column;">
-		  <p>User account email : <br><%= user.email %></p>
-		  <!-- <button onclick="location.href='/urls'" type="button">My links</button> -->
-		  <a href="/urls"><p>My Links -></p></a>
-		</div>
-	  <button type="submit">Logout</button>
-	</form>
-<%} else {%>
-	<a href="/register">Sign Up</a>
-	<a href="/login">Login</a>
-<%}%>
+<header>
+	<% if (user) { %>
+		<form action="/logout" method="POST">
+			<div style="display: flex; flex-direction: column;">
+			  <p>User account email : <br><%= user.email %></p>
+			  <a href="/urls"><p>My Links -></p></a>
+			</div>
+		  <button type="submit">Logout</button>
+		</form>
+	<%} else {%>
+		<a href="/register">Sign Up</a>
+		<a href="/login">Login</a>
+	<%}%>
+</header>
