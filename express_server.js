@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 
 app.set("view engine", "ejs");
-const PORT = process.env.PORT || 3000; // default port 8080
+const PORT = process.env.PORT || 3000;
 
 const bcrypt = require('bcrypt');
 let hashed_password = '';
@@ -13,14 +13,11 @@ app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
   keys: ['123'],
-  // Cookie Options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  maxAge: 24 * 60 * 60 * 1000
 }))
 
 app.use(function(req, res, next){
-	// Makes user useable in ejs files
   res.locals.user = users[req.session.user_id];
-  // Make req.user avable in routes
   req.user = users[req.session.user_id];
   next();
 });
@@ -29,23 +26,9 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static('public'));
 
-let urlDatabase = {
-  "b2xVn2": {
-  	longUrl: "http://www.lighthouselabs.ca",
-  	createdBy: 'uvwxyz'
-  },
-  "9sm5xK": {
-  	longUrl: "http://www.google.com",
-  	createdBy: 'abcdefg'
-  }
-};
-let users = {
-	'asdfjk': {
-		id: 'asdfjk',
-		email: "joe@example.com",
-		password: "asdf"
-	}
-};
+let urlDatabase = {};
+let users = {};
+
 app.use('/urls*?', (req, res, next) => {
 	if (req.user) {
 		next();
@@ -78,7 +61,7 @@ app.get("/urls", (req, res) => {
 			userUrls[shortURL] = urlDatabase[shortURL];
 		}
 	}
-  let templateVars = { urls: userUrls, foo: 123123 };
+  let templateVars = { urls: userUrls };
   res.render("urls_index", templateVars);
 });
 
@@ -158,7 +141,6 @@ app.get('/register', (req, res) => {
 
 // Registration Handler
 app.post('/register', (req, res) => {
-	// you will probably this from req.params // Need to know req.params
 	hashed_password = bcrypt.hashSync(req.body.password, 10);
 	const checkEmail = Object.values(users).some((u) => u.email === req.body.email);
 	if (checkEmail) {
@@ -174,7 +156,6 @@ app.post('/register', (req, res) => {
 		'email': req.body.email,
 		'password': hashed_password
 	};
-	// const userArr = Object.values(users).find( (u) => u.email === req.body.email );
 	res.redirect('/');
 });
 
