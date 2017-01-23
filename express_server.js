@@ -169,7 +169,7 @@ app.get('/login', (req, res) => {
 
 // Set Cookie Username & Login Handler
 app.post('/login', (req, res) => {
-	const matchUser = Object.values(users).find( (u) => u.email === req.body.email );// I need to know this
+	const matchUser = Object.values(users).find( (u) => u.email === req.body.email );
 	if (!matchUser || !bcrypt.compareSync(req.body.password, matchUser.password)) {
 		res.send('Please <a href="/login">Sign-in</a> with your correct email and password.\n Or you can <a href="/register">Register here</a> for a new account.', 401);
 	} else {
