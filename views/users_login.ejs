@@ -5,7 +5,9 @@
   	<link rel="stylesheet" type="text/css" href="../style.css">
   </head>
   <body style="font-size:20px; padding:50px;">
-    <% include partials/_header %>
+    <header>
+      <% include partials/_header %>
+    </header>
     <form action="/login" method="POST" style="margin:150px;">
       <input id="email" type="email" name="email" placeholder="Enter your email here" style="width: 300px">
       <input id="password" type="password" name="password" placeholder="Enter your password here" style="width: 300px">

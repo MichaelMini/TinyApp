@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>TinyApp</title>
-		<link rel="stylesheet" type="text/css" href="../style.css">
-	</head>
-	<body>
-    <% include partials/_header %>
-	  <section>
-	  	<form>
-		    <a href="/urls/new">Create your shortUrl!</a>
-	  	</form>
-		  <% for ( var key in urls ) { %>
-			  <form method="POST" action="/urls/<%= key %>/delete">
-					<p><%= key %> -> <%= urls[key].longUrl %></p>
-					<p>
-						<a href="/urls/<%= key %>">Edit</a>
-						<button type="">Delete</button>
-					</p>
-			  </form>
-		  <% } %>
-	  </section>
-	</body>
+  <head>
+    <title>TinyApp</title>
+    <link rel="stylesheet" type="text/css" href="../style.css">
+  </head>
+  <body>
+    <header>
+      <% include partials/_header %>
+    </header>
+    <section>
+      <div>
+        <a href="/urls/new">Create your shortUrl!</a>
+      </div>
+      <% for ( var key in urls ) { %>
+        <form method="POST" action="/urls/<%= key %>/delete">
+          <p><a href="http://localhost:3000/u/<%= key %>">http:\/\/localhost:3000/u/<%= key %></a><br> <%= key %> -> <%= urls[key].longUrl %></p>
+          <p>
+            <a href="/urls/<%= key %>">Edit</a>
+            <button type="">Delete</button>
+          </p>
+        </form>
+      <% } %>
+    </section>
+  </body>
 </html>
